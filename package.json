@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "func() { mv \"$1\" && npm run dev; }; func",
+    "start": "func() { mv ../webpack-boilerplate \"$1\" && npm run dev; }; func",
     "prod": "webpack",
     "dev": "webpack-dev-server --open",
     "test": "echo \"Error: no test specified\" && exit 1"
