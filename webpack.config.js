@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const webpack = require('webpack');
+const autoprefixer = require('autoprefixer')({ grid: true, browsers: ['>1%'] });
 
 module.exports = {
   mode: 'development',
@@ -34,6 +35,13 @@ module.exports = {
         use: [
           { loader: process.env.NODE_ENV === "production" ? MiniCssExtractPlugin.loader : 'style-loader' },
           { loader: 'css-loader' },
+          { loader: "postcss-loader",
+            options: {
+              plugins: [
+                autoprefixer
+              ]
+            }
+          },
           { loader: "sass-loader" },
         ]
       }
