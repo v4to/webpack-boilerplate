@@ -1,6 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
@@ -12,13 +13,14 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css"
+      filename: "style.min.css"
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './index.html',
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new OptimizeCssAssetsPlugin()
   ],
   devServer: {
     watchContentBase: true,
