@@ -50,7 +50,7 @@ module.exports = {
   ],
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
-    before: function(app, server) {
+    before: function (app, server) {
       devServer = server;
     },
     hot: true,
@@ -106,6 +106,12 @@ module.exports = {
               extract: true
             }
           }
+        ]
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: [
+          { loader: 'file-loader?name=[name].[ext]' }
         ]
       }
     ]
