@@ -3,9 +3,28 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const multi = require('multi-loader');
+let devServer;
+
+// Ability to reload html
+function reloadHtml() {
+  const cache = {};
+  const plugin = { name: 'CustomHtmlReloadPlugin' };
+  this.hooks.compilation.tap(plugin, compilation => {
+    compilation.hooks.htmlWebpackPluginAfterEmit.tap(plugin, data => {
+      const orig = cache[data.outputName];
+      const html = data.html.source();
+      // plugin seems to emit on any unrelated change?
+      if (orig && orig !== html) {
+        devServer.sockWrite(devServer.sockets, 'content-changed');
+      }
+      cache[data.outputName] = html;
+    });
+  });
+}
 
 module.exports = {
   mode: 'development',
@@ -22,13 +41,18 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './index.html',
+      template: './src/index.html'
     }),
+    reloadHtml,
     new webpack.HotModuleReplacementPlugin(),
-    new OptimizeCssAssetsPlugin()
+    new OptimizeCssAssetsPlugin(),
+    new SpriteLoaderPlugin({ plainSprite: true })
   ],
   devServer: {
-    watchContentBase: true,
+    contentBase: path.resolve(__dirname, 'dist'),
+    before: function(app, server) {
+      devServer = server;
+    },
     hot: true,
     host: '0.0.0.0'
   },
@@ -37,16 +61,20 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-          { loader: process.env.NODE_ENV === 'production' ? MiniCssExtractPlugin.loader : 'style-loader' },
+          {
+            loader:
+              process.env.NODE_ENV === 'production'
+                ? MiniCssExtractPlugin.loader
+                : 'style-loader'
+          },
           { loader: 'css-loader' },
-          { loader: 'postcss-loader',
+          {
+            loader: 'postcss-loader',
             options: {
-              plugins: [
-                autoprefixer({ grid: true, browsers: ['>1%'] })
-              ]
+              plugins: [autoprefixer({ grid: true, browsers: ['>1%'] })]
             }
           },
-          { loader: 'sass-loader' },
+          { loader: 'sass-loader' }
         ]
       },
       {
@@ -54,16 +82,30 @@ module.exports = {
         use: [
           {
             loader: multi(
-            'file-loader!image-webpack-loader?{"mozjpeg":{"progressive":true}}',
-            'file-loader?name=[hash].webp!image-webpack-loader?{"webp":{"quality":90}}')
+              'file-loader?name=[name].[ext]!image-webpack-loader?{"mozjpeg":{"progressive":true}}',
+              'file-loader?name=[name].webp!image-webpack-loader?{"webp":{"quality":90}}'
+            )
           }
         ]
       },
       {
         test: /\.svg$/i,
+        exclude: path.resolve(__dirname, 'src/sprite'),
         use: [
-          { loader: 'file-loader'},
-          { loader: 'image-webpack-loader'}
+          { loader: 'file-loader?name=[name].[ext]' },
+          { loader: 'image-webpack-loader' }
+        ]
+      },
+      {
+        test: /\.svg$/i,
+        include: path.resolve(__dirname, 'src/sprite'),
+        use: [
+          {
+            loader: 'svg-sprite-loader',
+            options: {
+              extract: true
+            }
+          }
         ]
       }
     ]
