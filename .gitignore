@@ -76,7 +76,8 @@ typings/
 .idea/
 
 # dist
-dist/
+dist/bundle.js
+dist/bundle.js.map
 
 #.DS_Store
 .DS_Store
