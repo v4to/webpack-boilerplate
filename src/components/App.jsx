@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 const App = () => {
   return <div>
@@ -6,4 +6,4 @@ const App = () => {
   </div>;
 };
 
-export { App };
+export default App;
