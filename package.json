@@ -34,7 +34,7 @@
     "imagemin-webpack-plugin": "^2.4.2",
     "mini-css-extract-plugin": "^0.4.5",
     "multi-loader": "^0.1.0",
-    "node-sass": "^4.9.2",
+    "node-sass": "^7.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.0",
     "postcss-loader": "^2.1.6",
     "sass-loader": "^7.0.3",
